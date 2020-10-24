@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.system.dao.SysUserDao">
+
+    <select id="getUserDtoByName" resultType="com.example.demo.system.dto.SysUserDto">
+        select
+          u.id,
+          u.login_name,
+          u.user_name,
+          u.mobile,
+          u.job,
+          u.is_abled,
+          u.dept_code,
+          u.dept_name,
+          u.created_by,
+          u.created_name,
+          u.created_date,
+          u.last_modified_by,
+          u.last_modified_name,
+          u.last_modified_date
+        from
+          sys_user u
+        where
+          u.is_deleted = false
+          and u.login_name = #{name}
+    </select>
+    
+    <select id="getUserDtoByUID" resultType="com.example.demo.system.dto.SysUserDto">
+         select
+          u.id,
+          u.login_name,
+          u.user_name,
+          u.mobile,
+          u.job,
+          u.is_abled,
+          u.dept_code,
+          u.dept_name,
+          u.created_by,
+          u.created_name,
+          u.created_date,
+          u.last_modified_by,
+          u.last_modified_name,
+          u.last_modified_date
+        from
+          sys_user u
+        where
+          u.is_deleted = false
+          and u.id = #{uid}
+    </select>
+    
+    <select id="getPasswordByUID" resultType="com.example.demo.system.dao.entity.SysUserPassword">
+        select
+          p.id,
+          p.user_id,
+          p.cipher_type,
+          p.cipher_salt,
+          p.cipher_code
+        from
+          sys_user_password p
+        where
+          p.user_id = #{userId}
+    </select>
+    
+    <select id="getUserRolesByUID" resultType="com.example.demo.system.dao.entity.SysUserRole">
+        select
+          ur.id,
+          ur.user_id,
+          ur.role_id
+        from
+          sys_user_role ur
+        where
+          ur.user_id = #{uid}
+    </select>
+    
+    <select id="getRoleAuthDeptByUID" resultType="com.example.demo.system.dao.entity.SysRoleAuthDept">
+        select
+          rad.role_id    as roleId,
+          rad.dept_code as deptCode
+        from
+          (
+            select role_id
+            from sys_user_role
+            where user_id = #{uid}
+           ) r left join sys_role_auth_dept rad  on r.role_id = rad.role_id
+    </select>
+
+    <select id="getRoleAuthMenuByUID" resultType="com.example.demo.system.dao.entity.SysRoleAuthMenu">
+        select
+          ram.role_id   as roleId,
+          ram.menu_code as menuCode
+        from
+          (
+            select role_id
+            from sys_user_role
+            where user_id = #{uid}
+          ) r left join sys_role_auth_menu ram on r.role_id = ram.role_id
+    </select>
+
+    <select id="getUserNatureDept" resultType="com.example.demo.system.dao.entity.SysOrg">
+        select
+          o.id             as id,
+          o.code           as code,
+          o.parent_code    as parentCode,
+          o.dept_name      as deptName,
+          o.dept_abbr_name as deptAbbrName,
+          o.level          as level,
+          case when p.id is null then 0 else p.id end as pid
+        from
+          sys_org o left join sys_org p on o.parent_code = p.code
+        where o.code like concat(#{deptCode},'%')
+        order by o.id
+    </select>
+</mapper>

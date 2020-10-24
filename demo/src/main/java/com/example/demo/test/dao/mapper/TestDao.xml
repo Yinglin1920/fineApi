@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.test.dao.TestDao">
+
+    <select id="selectData" resultType="map">
+        select
+        id,
+        kind,
+        type
+        from
+        lyl_test
+        where
+        is_delete = false
+    </select>
+
+    <select id="selectDtoData" resultType="com.example.demo.test.dao.entity.Test">
+        select
+        id,
+        kind,
+        type
+        from
+        lyl_test
+        where
+        is_delete = false
+    </select>
+
+    <select id="getById" resultType="com.example.demo.test.dao.entity.Test">
+        select
+        id,
+        kind,
+        type
+        from
+        lyl_test
+        where
+        is_delete = false
+        and id= #{id}
+    </select>
+
+    <update id="insetUpdateData" parameterType="com.example.demo.test.dto.TestDto">
+        INSERT INTO lyl_test
+        (kind, type)
+        VALUES
+        ( #{kind}, #{type} )
+         ON DUPLICATE KEY UPDATE
+        type = #{type}
+    </update>
+
+    <delete id="deleteData">
+        UPDATE lyl_test
+        SET
+        is_delete= true ,
+        deleted_date = now()
+        WHERE id IN
+        <foreach item="id" index="index" collection="ids"
+                 open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="getSta" resultType="com.example.demo.test.dto.TestStatisticsDto">
+        select
+          kind      as label,
+          count(id) as num
+        from
+            lyl_test
+        where
+            is_delete = false
+        group by kind
+    </select>
+
+</mapper>
